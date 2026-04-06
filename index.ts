@@ -8,8 +8,8 @@ async function main() {
 
   const id = await enqueue("email", {
     to: "falasefemi31@gmail.com",
-    subject: "Hello from Herald",
-    html: "<strong>Hello from Herald!</strong>",
+    subject: "Hello from world",
+    html: "<strong>Hello from world!</strong>",
   });
   console.log("Enqueued job:", id);
 
@@ -18,4 +18,3 @@ async function main() {
 }
 
 main();
-

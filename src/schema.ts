@@ -1,3 +1,4 @@
+import { Effect } from "effect";
 import { executeSql } from "./db";
 
 const createEnum = `
@@ -37,13 +38,10 @@ const createIndex = `
   WHERE status < 'active'
 `;
 
-export async function migrate() {
-  try {
-    await executeSql(createEnum);
-    await executeSql(createJobsTable);
-    await executeSql(createIndex);
-    console.log("migration done");
-  } catch (error) {
-    console.error("migration failed", error);
-  }
-}
+export const migrate = Effect.gen(function* () {
+  yield* executeSql(createEnum);
+  yield* executeSql(createJobsTable);
+  yield* executeSql(createIndex);
+  console.log("migration done");
+  return;
+});

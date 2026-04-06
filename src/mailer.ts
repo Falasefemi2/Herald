@@ -1,5 +1,7 @@
 import { Resend } from "resend";
+import { Effect } from "effect";
 import { register } from "./worker";
+import { EmailError } from "./errors";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -11,12 +13,21 @@ type EmailPayload = {
   html: string;
 };
 
-register("email", async (payload) => {
-  const email = payload as EmailPayload;
-  await resend.emails.send({
-    from,
-    to: [email.to],
-    subject: email.subject,
-    html: email.html,
+const sendEmail = (email: EmailPayload) =>
+  Effect.tryPromise({
+    try: () =>
+      resend.emails.send({
+        from,
+        to: [email.to],
+        subject: email.subject,
+        html: email.html,
+      }),
+    catch: (cause) => new EmailError({ cause }),
   });
-});
+
+register("email", (payload) =>
+  Effect.gen(function* () {
+    const email = payload as EmailPayload;
+    yield* sendEmail(email);
+  }),
+);
